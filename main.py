@@ -15,7 +15,7 @@ selected_model = chatbot.models[0]
 temperature = 1.5
 
 # define url of backend chat API
-backend_url = "http://127.0.0.1:8888/chat_batch"
+backend_url = "http://127.0.0.1:5000/chat_batch"
 
 # handle sending requests and receiving responses
 def handle_message(user_input):
@@ -44,10 +44,11 @@ def handle_message(user_input):
                 bot_response += chunk
 
             # display bot response with adaptable height
+            st.markdown("Sharwie:")
             st.markdown(
                 f"""
-                <div style="background-color:#f0f0f0; padding:10px; border-radius: 5px;">
-                    <p style="font-family: Arial, sans-serif;">{bot_response.strip()}</p>
+                <div style="background-color:#262730; padding:10px; border-radius: 5px;">
+                    <p style="font-family: Arial, sans-serif; font-color: #2f2f2f">{bot_response.strip()}</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -57,10 +58,10 @@ def handle_message(user_input):
                 "<p style='color: red;'>Error: Unable to get response from server.</p>",
                 unsafe_allow_html=True,
             )
-    # input text box for user input
-    if 'current_input' not in st.session_state:
-        st.session_state.current_input = ""
-    user_input = st.text_input("You:", st.session_state.current_input)
+# input text box for user input
+if 'current_input' not in st.session_state:
+    st.session_state.current_input = ""
+user_input = st.text_input("You:", st.session_state.current_input)
 
-    if st.button("Send"):
-        handle_message(user_input)
+if st.button("Send"):
+    handle_message(user_input)
