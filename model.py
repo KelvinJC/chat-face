@@ -1,12 +1,11 @@
-import os
-from dotenv import load_dotenv
-
 import groq
+
+from config import groq_api_key
+
 
 class ChatBot():
     # set groq api key
-    GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-    client = groq.Groq(api_key=GROQ_API_KEY)
+    client = groq.Groq(api_key=groq_api_key)
     query: str
     output: str
     models = [
