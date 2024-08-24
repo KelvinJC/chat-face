@@ -18,9 +18,8 @@ async def chat_batch(request: Request):
     temperature_input = float(user_input.get("temperature"))
     selected_model = user_input.get("model")
 
-    try:
-            
-        response = chatbot.get_response(
+    try: 
+        response = chatbot.get_response_batch(
             message=user_message,
             temperature=temperature_input,
             model=selected_model,
