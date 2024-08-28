@@ -79,16 +79,12 @@ def handle_message(
         # clear input box for next question
         st.session_state.current_input = ""
 
-# main layout
-def main():
-    # display chat history first
-    # display_chat_history()
-
-    # collect user input below the chat history
-    with st.form(key="input_form", clear_on_submit=True):
+def get_configs():
+    with st.sidebar:
         # select model and training parameter
         selected_model = st.selectbox("Select your preferred model: ", chatbot.models)
         selected_response_type = st.selectbox("Select your preferred output type", chatbot.output_type)
+        a = st.selectbox("", [1])
         temperature = st.number_input(
             "Enter the parameter for model temperature (Number must be a float between 0 and 2)", 
             min_value=0.0,
@@ -98,8 +94,17 @@ def main():
             format="%.1f"
         )
         set_tokens = st.selectbox("Please select length of output", chatbot.token_class.keys())
-        user_input = st.text_input("You:", "")
+        return selected_model, selected_response_type, temperature, set_tokens
 
+# main layout
+def main():
+    # display chat history first
+    # display_chat_history()
+
+    selected_model, selected_response_type, temperature, set_tokens = get_configs()
+    # collect user input below the chat history
+    with st.form(key="input_form", clear_on_submit=True):
+        user_input = st.text_input("You:", "")
         # submit button to send the input
         submit_button = st.form_submit_button(label="Send")
 
@@ -110,12 +115,6 @@ def main():
             backend_url = "http://127.0.0.1:5000/chat_batch"
         
         if submit_button and user_input:
-            print("HERE", user_input,
-                backend_url,
-                selected_response_type,
-                selected_model,
-                set_tokens,
-                temperature,)
             handle_message(
                 user_input=user_input,
                 backend_url=backend_url,
