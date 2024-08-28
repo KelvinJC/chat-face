@@ -34,7 +34,7 @@ async def chat_batch(request: Request):
             "status_code": 400,
         }
     
-@app.route("/chat_stream", method=["POST"])
+@app.route("/chat_stream", methods=["POST"])
 async def chat_stream(request: Request):
     try:
         user_input = await request.json()
