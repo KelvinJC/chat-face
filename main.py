@@ -9,6 +9,8 @@ chatbot = ChatBot()
 # initialise session state for tracking user input and responses
 if 'responses' not in st.session_state:
     st.session_state.responses = []
+    
+st.set_page_config(page_title="quaLLM.ai", page_icon="✨", layout="wide")
 
 def handle_message(
     user_input,
