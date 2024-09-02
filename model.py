@@ -17,7 +17,7 @@ class ChatBot():
     ]
     output_type = ["Stream", "Batch"]
     token_class = {
-        "short": 150,
+        "Short": 150,
         "Moderate": 700,
         "Long": 1536,
     }
@@ -34,7 +34,7 @@ class ChatBot():
                 ],
                 stream=True,
                 temperature=temperature,
-                max_tokens=token,
+                # max_tokens=token,
             )
             return response
         except Exception as e:
@@ -54,8 +54,9 @@ class ChatBot():
                 ],
                 response_format={"type": "text"},
                 temperature=temperature,
-                max_tokens=token,
+                # max_tokens=token,
             )
+            print("resonse", response)
             return response
         except Exception as e:
             print(traceback.format_exc())
