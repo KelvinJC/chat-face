@@ -14,16 +14,60 @@ chatbot = ChatBot()
 
 @app.route("/chat_batch", methods=["POST"])
 async def chat_batch(request: Request):
-    user_input = await request.json()
-    user_message = user_input.get("message")
-    temperature_input = float(user_input.get("temperature"))
-    selected_model = user_input.get("model")
+    # user_input = await request.json()
+    # user_message = user_input.get("message")
+    # temperature_input = float(user_input.get("temperature"))
+    # selected_model = user_input.get("model")
+    # selected_token_size = user_input.get("max_tokens")
 
-    try: 
+    # try:
+    #     print("yesy") 
+    #     response = chatbot.get_response_batch(
+    #         message=user_message,
+    #         temperature=temperature_input,
+    #         model=selected_model,
+    #         token=selected_token_size,
+    #     )
+    #     output = response.choices[0].message.content
+    try:
+        user_input = await request.json()
+        # get message
+        user_message = user_input.get("message")
+        if not user_message:
+            raise HTTPException(status_code=400, detail="No message provided")
+        
+        # add temperature
+        try: 
+            temperature = float(user_input.get("temperature"))
+        except:
+            return {
+                "error": "Invalid input, pass a valid number between 0 and 2"
+            }
+        
+        # add token class
+        try:
+            selected_token_class = user_input.get("max_tokens")
+            max_tokens = chatbot.token_class[selected_token_class]
+        except Exception as e:
+            print("Error with selecting tokens \n", e)
+
+        # add model selection
+        try:
+            selected_model = user_input.get("model")
+            if selected_model not in chatbot.models:
+                return {
+                    "error": "Model not available."
+                }
+            else:
+                model = selected_model
+        except Exception as e:
+            print("Invalid model input", e)
+        # generate response
         response = chatbot.get_response_batch(
             message=user_message,
-            temperature=temperature_input,
-            model=selected_model,
+            temperature=temperature,
+            model=model,
+            token=max_tokens,
         )
         output = response.choices[0].message.content
         return PlainTextResponse(content=output, status_code=200)
