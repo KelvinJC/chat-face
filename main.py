@@ -47,14 +47,14 @@ def handle_message(
                     # update response container with the latest bot response
                     response_container.markdown(
                         f"""
-                        <div style="background-color:#262730; padding:10px; border-radius: 5px;">
+                        <div style="padding:10px; border-radius: 5px;">
                             <p style="font-family: Arial, sans-serif; font-color: #2f2f2f">{bot_response.strip()}</p>
                         </div>
                         """,
                         unsafe_allow_html=True,
                     )
-                    # # update the latest bot response in session state
-                    # st.session_state.responses[-1]['bot'] = bot_response.strip()
+                    # update the latest bot response in session state
+                    st.session_state.responses[-1]['bot'] = bot_response.strip()
 
             else:
                 # collect the batch response
@@ -64,7 +64,7 @@ def handle_message(
                 # display bot's response with adaptable height
                 st.markdown(
                     f"""
-                    <div style="background-color:#262730; padding:10px; border-radius: 5px;">
+                    <div style="padding:10px; border-radius: 5px;">
                         <p style="font-family: Arial, sans-serif; font-color: #2f2f2f">{bot_response.strip()}</p>
                     </div>
                     """,
@@ -94,14 +94,6 @@ def select_response():
 
 def get_configs():
     with st.sidebar:
-        # expander = st.expander(
-        #     "🗀 {}".format(
-        #         st.session_state.get("selected_response_type", "Stream")
-        #     )
-        # )
-        # selected_response_type = select_response()
-        
-        # expander = st.expander("🗀 Output Types", expanded=True)
         expander = st.expander("Select your response type", expanded=True)
         selected_response_type = chatbot.output_type[0] # default selection is Stream
         with expander:
@@ -110,11 +102,8 @@ def get_configs():
                 chatbot.output_type,
                 index=None,
             )
-        # selected_response_type = st.selectbox("Select your preferred output type", chatbot.output_type)
-
-        # select model and training parameter
+        # select model and training parameters
         selected_model = st.selectbox("Select your preferred model: ", chatbot.models)
-
         temperature = st.number_input(
             "Enter the parameter for model temperature (Number must be a float between 0 and 2)", 
             min_value=0.0,
@@ -126,25 +115,52 @@ def get_configs():
         set_tokens = st.selectbox("Please select length of output", chatbot.token_class.keys())
         return selected_model, selected_response_type, temperature, set_tokens
 
+# Display the chat history
+def display_chat_history():
+    with st.container():
+        for response in st.session_state.responses:
+            left, right = st.columns(2)
+            right.markdown(f"""
+            <div style="background-color:#262730; padding:10px; bottom-margin: 1px; border-radius:20px;">
+                <p style="font-family:Arial, sans-serif; font-color: #2f2f2f; ">{response['user']}</p>
+            </div>
+            </br>
+            """, 
+            unsafe_allow_html=True)
+            st.empty().markdown(f"""
+            <div style="padding:10px; bottom-margin: 1px; border-radius:5px;">
+                <p style="font-family:Arial, sans-serif; font-color: #2f2f2f; ">{response['bot']}</p>
+            </div>
+            </br>
+            """, 
+            unsafe_allow_html=True)
+
+
 # main layout
 def main():
     # display chat history first
-    # display_chat_history()
+    display_chat_history()
 
     selected_model, selected_response_type, temperature, set_tokens = get_configs()
     # collect user input below the chat history
-    with st.form(key="input_form", clear_on_submit=False):
-        user_input = st.text_input("You:", "")
-        # submit button to send the input
-        submit_button = st.form_submit_button(label="Send")
-
+    prompt = st.chat_input("Ask a question")
+    if prompt:
+        user_input = prompt
         # define the URL of the backend API
         if selected_response_type == chatbot.output_type[0]:
             backend_url = "http://127.0.0.1:5000/chat_stream"
         else:
             backend_url = "http://127.0.0.1:5000/chat_batch"
         
-        if submit_button and user_input:
+        if user_input:
+            left, right = st.columns(2)
+            right.markdown(f"""
+            <div style="background-color:#262730; padding:10px; bottom-margin: 1px; border-radius:20px;">
+                <p style="font-family:Arial, sans-serif; font-color: #2f2f2f; ">{user_input}</p>
+            </div>
+            </br>
+            """, 
+            unsafe_allow_html=True)
             handle_message(
                 user_input=user_input,
                 backend_url=backend_url,
