@@ -62,11 +62,13 @@ def handle_message(
                     bot_response += chunk
                 
                 # display bot's response with adaptable height
-                st.markdown(f"""
-                    <div style="background-color:#f0f0f0; padding:10px; border-radius:5px;">
-                        <p style="font-family:Arial, sans-serif;">{bot_response.strip()}</p>
-                    </div>""", 
-                unsafe_allow_html=True,
+                st.markdown(
+                    f"""
+                    <div style="background-color:#262730; padding:10px; border-radius: 5px;">
+                        <p style="font-family: Arial, sans-serif; font-color: #2f2f2f">{bot_response.strip()}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
             # update the latest bot response in session state
             st.session_state.responses[-1]['bot'] = bot_response.strip()
@@ -75,16 +77,44 @@ def handle_message(
             response_container.markdown(
                 "<p style='color:red;'>Error: Unable to get a response from the server.</p>", 
                 unsafe_allow_html=True,
-                )
+            )
         # clear input box for next question
-        st.session_state.current_input = ""
+        # st.session_state.current_input = ""
+
+def select_response():
+    expander = st.expander("Select your response type", expanded=True)
+
+    with expander:
+        selected_response_type = st.radio(
+            "Select your preferred output type",
+            chatbot.output_type,
+            index=None,
+        )
+        return selected_response_type
 
 def get_configs():
     with st.sidebar:
+        # expander = st.expander(
+        #     "🗀 {}".format(
+        #         st.session_state.get("selected_response_type", "Stream")
+        #     )
+        # )
+        # selected_response_type = select_response()
+        
+        # expander = st.expander("🗀 Output Types", expanded=True)
+        expander = st.expander("Select your response type", expanded=True)
+        selected_response_type = chatbot.output_type[0] # default selection is Stream
+        with expander:
+            selected_response_type = st.radio(
+                "Output types",
+                chatbot.output_type,
+                index=None,
+            )
+        # selected_response_type = st.selectbox("Select your preferred output type", chatbot.output_type)
+
         # select model and training parameter
         selected_model = st.selectbox("Select your preferred model: ", chatbot.models)
-        selected_response_type = st.selectbox("Select your preferred output type", chatbot.output_type)
-        a = st.selectbox("", [1])
+
         temperature = st.number_input(
             "Enter the parameter for model temperature (Number must be a float between 0 and 2)", 
             min_value=0.0,
@@ -103,7 +133,7 @@ def main():
 
     selected_model, selected_response_type, temperature, set_tokens = get_configs()
     # collect user input below the chat history
-    with st.form(key="input_form", clear_on_submit=True):
+    with st.form(key="input_form", clear_on_submit=False):
         user_input = st.text_input("You:", "")
         # submit button to send the input
         submit_button = st.form_submit_button(label="Send")
